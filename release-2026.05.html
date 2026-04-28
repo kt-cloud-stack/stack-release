@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STACK Release Notes · 2026.05</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c12;
+    --bg-panel: #0d1420;
+    --bg-card: #111827;
+    --bg-hover: #162032;
+    --border: #1e2d45;
+    --border-bright: #243650;
+    --text-primary: #e2eaf5;
+    --text-secondary: #7a93b4;
+    --text-muted: #4a6280;
+    --accent-blue: #2d8cf0;
+    --accent-cyan: #00d4c8;
+    --accent-green: #00e87a;
+    --accent-amber: #f0a020;
+    --accent-red: #ff4c6a;
+    --accent-purple: #a855f7;
+    --accent-ktc: #ff6b35;
+    --glow-blue: rgba(45,140,240,0.15);
+    --glow-cyan: rgba(0,212,200,0.12);
+    --glow-green: rgba(0,232,122,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid Background ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(45,140,240,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,140,240,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Layout ── */
+  .layout {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-logo .version-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent-cyan);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .sidebar-logo h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .sidebar-logo .release-date {
+    margin-top: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .nav-section {
+    padding: 12px 0;
+    flex: 1;
+  }
+
+  .nav-label {
+    padding: 8px 24px 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 24px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.18s ease;
+    border-left: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .nav-item:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+    border-left-color: var(--accent-blue);
+  }
+
+  .nav-item.active {
+    color: var(--accent-cyan);
+    background: rgba(0,212,200,0.06);
+    border-left-color: var(--accent-cyan);
+  }
+
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-new    { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+  .dot-change { background: var(--accent-amber); box-shadow: 0 0 6px var(--accent-amber); }
+  .dot-bug    { background: var(--accent-red);   box-shadow: 0 0 6px var(--accent-red); }
+  .dot-os     { background: var(--accent-blue);  box-shadow: 0 0 6px var(--accent-blue); }
+  .dot-k8s    { background: var(--accent-cyan);  box-shadow: 0 0 6px var(--accent-cyan); }
+  .dot-os2    { background: var(--accent-purple); box-shadow: 0 0 6px var(--accent-purple); }
+  .dot-cicd   { background: var(--accent-amber); box-shadow: 0 0 6px var(--accent-amber); }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* ── Main Content ── */
+  .main {
+    margin-left: 260px;
+    flex: 1;
+    padding: 0 48px 80px;
+    max-width: 1100px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 64px 0 48px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '2026.05';
+    position: absolute;
+    right: -20px;
+    top: 20px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 120px;
+    color: rgba(45,140,240,0.04);
+    pointer-events: none;
+    user-select: none;
+    line-height: 1;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  .chip-latest {
+    background: rgba(0,232,122,0.12);
+    border: 1px solid rgba(0,232,122,0.3);
+    color: var(--accent-green);
+  }
+
+  .chip-stable {
+    background: rgba(45,140,240,0.1);
+    border: 1px solid rgba(45,140,240,0.25);
+    color: var(--accent-blue);
+  }
+
+  .chip-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(28px, 4vw, 44px);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: var(--text-secondary);
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .meta-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .meta-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+
+  /* ── Sections ── */
+  .section {
+    padding: 48px 0 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .icon-new    { background: rgba(0,232,122,0.12); border: 1px solid rgba(0,232,122,0.25); }
+  .icon-change { background: rgba(240,160,32,0.12); border: 1px solid rgba(240,160,32,0.25); }
+  .icon-bug    { background: rgba(255,76,106,0.12); border: 1px solid rgba(255,76,106,0.25); }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  .section-count {
+    margin-left: auto;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+
+  /* ── Feature Cards ── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .feature-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+
+  .feature-card.new::before   { background: linear-gradient(90deg, var(--accent-green), transparent); }
+  .feature-card.change::before { background: linear-gradient(90deg, var(--accent-amber), transparent); }
+
+  .feature-card:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  .card-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
+  .cat-os        { background: rgba(45,140,240,0.1);  color: var(--accent-blue);   border: 1px solid rgba(45,140,240,0.2); }
+  .cat-k8s       { background: rgba(0,212,200,0.08);  color: var(--accent-cyan);   border: 1px solid rgba(0,212,200,0.2); }
+  .cat-openstack { background: rgba(168,85,247,0.08); color: var(--accent-purple); border: 1px solid rgba(168,85,247,0.2); }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .card-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .card-items li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .card-items li::before {
+    content: '›';
+    color: var(--accent-cyan);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Changes Table ── */
+  .change-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .change-row {
+    display: grid;
+    grid-template-columns: 180px 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    transition: all 0.18s ease;
+  }
+
+  .change-row:hover {
+    border-color: var(--border-bright);
+    background: var(--bg-hover);
+  }
+
+  .change-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .version-old {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 3px 10px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+  }
+
+  .arrow {
+    color: var(--accent-amber);
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .version-new {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent-green);
+    padding: 3px 10px;
+    background: rgba(0,232,122,0.08);
+    border-radius: 4px;
+    border: 1px solid rgba(0,232,122,0.2);
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* ── Bug Fix ── */
+  .bug-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(255,76,106,0.2);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bug-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent-red);
+    border-radius: 3px 0 0 3px;
+  }
+
+  .bug-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .bug-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .bug-text strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  /* ── Version Tables ── */
+  .version-section {
+    padding: 48px 0 0;
+  }
+
+  .version-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .vsec-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .vsec-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+  }
+
+  .vsec-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-left: auto;
+    padding: 2px 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+  }
+
+  .vtable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .vtable th {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: left;
+    padding: 8px 16px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .vtable th:first-child { border-radius: 8px 0 0 0; }
+  .vtable th:last-child  { border-radius: 0 8px 0 0; }
+
+  .vtable td {
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    color: var(--text-secondary);
+    vertical-align: middle;
+  }
+
+  .vtable tr:last-child td { border-bottom: none; }
+
+  .vtable tr:hover td {
+    background: rgba(45,140,240,0.04);
+    color: var(--text-primary);
+  }
+
+  .vtable td:first-child {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+
+  .vtable tbody {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0 0 8px 8px;
+  }
+
+  .vbadge {
+    display: inline-flex;
+    align-items: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0;
+  }
+
+  .vbadge-default {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .vbadge-ktc {
+    background: rgba(255,107,53,0.12);
+    color: var(--accent-ktc);
+    border: 1px solid rgba(255,107,53,0.3);
+  }
+
+  .ktc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    padding: 1px 7px;
+    border-radius: 3px;
+    background: rgba(255,107,53,0.1);
+    color: var(--accent-ktc);
+    border: 1px solid rgba(255,107,53,0.25);
+    margin-left: 6px;
+    vertical-align: middle;
+    text-transform: uppercase;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+    margin: 48px 0 0;
+  }
+
+  /* ── Scroll to top ── */
+  .scroll-top {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 40px;
+    height: 40px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 16px;
+    transition: all 0.18s ease;
+    text-decoration: none;
+    z-index: 200;
+  }
+
+  .scroll-top:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    box-shadow: 0 0 16px rgba(45,140,240,0.2);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .sidebar { transform: translateX(-100%); }
+    .main { margin-left: 0; padding: 0 24px 80px; }
+    .change-row { grid-template-columns: 1fr; gap: 8px; }
+    .hero::after { display: none; }
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero         { animation: fadeUp 0.5s ease both; }
+  .section      { animation: fadeUp 0.5s ease 0.1s both; }
+  .feature-card { animation: fadeUp 0.4s ease both; }
+  .feature-card:nth-child(2) { animation-delay: 0.08s; }
+  .feature-card:nth-child(3) { animation-delay: 0.16s; }
+  .change-row:nth-child(n) { animation: fadeUp 0.35s ease both; }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="version-tag">Release Notes</div>
+      <h1>STACK<br>2026.05</h1>
+      <div class="release-date">Published · 2026-05-06</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <a class="nav-item active" href="#top">
+        <span class="nav-dot" style="background:var(--accent-cyan);box-shadow:0 0 6px var(--accent-cyan)"></span>
+        하이라이트
+      </a>
+
+      <div class="nav-label" style="margin-top:8px">변경 내용</div>
+      <a class="nav-item" href="#new-features">
+        <span class="nav-dot dot-new"></span>신규 기능
+      </a>
+      <a class="nav-item" href="#changes">
+        <span class="nav-dot dot-change"></span>변경 사항
+      </a>
+      <a class="nav-item" href="#bugfix">
+        <span class="nav-dot dot-bug"></span>버그 수정
+      </a>
+
+      <div class="nav-label" style="margin-top:8px">구성 요소 버전</div>
+      <a class="nav-item" href="#ver-os">
+        <span class="nav-dot dot-os"></span>OS
+      </a>
+      <a class="nav-item" href="#ver-k8s">
+        <span class="nav-dot dot-k8s"></span>Kubernetes
+      </a>
+      <a class="nav-item" href="#ver-openstack">
+        <span class="nav-dot dot-os2"></span>OpenStack
+      </a>
+      <a class="nav-item" href="#ver-cicd">
+        <span class="nav-dot dot-cicd"></span>CI/CD Tools
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      kt-cloud-stack/stack-release<br>
+      tag: 2026.05 · latest
+    </div>
+  </nav>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- Hero -->
+    <section class="hero" id="top">
+      <div class="hero-eyebrow">
+        <span class="chip chip-latest"><span class="chip-dot"></span>Latest</span>
+        <span class="chip chip-stable">Stable</span>
+      </div>
+      <h1>STACK 통합<br><span>릴리스 노트</span> · 2026.05</h1>
+      <p class="hero-desc">경북/서울 리전 구축 이후 안정화 버전. 주요 컴포넌트 업그레이드와 OS 자동화 기능 신규 추가, Neutron 네트워크 기능 확장을 포함합니다.</p>
+      <div class="hero-meta">
+        <div class="meta-item">
+          <span class="meta-label">Release Date</span>
+          <span class="meta-value">2026-05-06</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">OpenStack</span>
+          <span class="meta-value">Epoxy 2025.1</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Kubernetes</span>
+          <span class="meta-value">v1.32.13</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">OS</span>
+          <span class="meta-value">Ubuntu 24.04.2 LTS</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- New Features -->
+    <section class="section" id="new-features">
+      <div class="section-header">
+        <div class="section-icon icon-new">✦</div>
+        <span class="section-title">신규 기능</span>
+        <span class="section-count">6 items</span>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card new">
+          <span class="card-category cat-os">⬡ OS</span>
+          <div class="card-title">ktc-ini-ansible 자동화</div>
+          <ul class="card-items">
+            <li>Timezone 자동 변경 기능</li>
+            <li>Vaccine 에이전트 설치 자동화</li>
+            <li>Netplan 네트워크 설정 자동화</li>
+            <li>Netbackup Agent 설치 자동화</li>
+          </ul>
+        </div>
+
+        <div class="feature-card new">
+          <span class="card-category cat-openstack">⬡ OpenStack · Neutron</span>
+          <div class="card-title">네트워크 기능 확장</div>
+          <ul class="card-items">
+            <li>VPC Flow Log — 트래픽 흐름 로깅 지원</li>
+            <li>Network Metering — 네트워크 사용량 계량 기능</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Changes -->
+    <section class="section" id="changes">
+      <div class="section-header">
+        <div class="section-icon icon-change">↑</div>
+        <span class="section-title">변경 사항</span>
+        <span class="section-count">6 upgrades</span>
+      </div>
+
+      <div class="change-grid">
+        <div class="change-row">
+          <span class="change-label">OS Kernel</span>
+          <span class="version-old">6.8.0-71</span>
+          <span class="arrow">→</span>
+          <span class="version-new">6.8.0-90</span>
+        </div>
+        <div class="change-row">
+          <span class="change-label">QEMU</span>
+          <span class="version-old">8.2.1</span>
+          <span class="arrow">→</span>
+          <span class="version-new">10.0.7</span>
+        </div>
+        <div class="change-row">
+          <span class="change-label">Kubernetes</span>
+          <span class="version-old">v1.32.6</span>
+          <span class="arrow">→</span>
+          <span class="version-new">v1.32.13</span>
+        </div>
+        <div class="change-row">
+          <span class="change-label">kube-ovn</span>
+          <span class="version-old">v1.14.5</span>
+          <span class="arrow">→</span>
+          <span class="version-new">v1.15.4</span>
+        </div>
+        <div class="change-row">
+          <span class="change-label">envoy</span>
+          <span class="version-old">v1.4.2</span>
+          <span class="arrow">→</span>
+          <span class="version-new">v1.6.2</span>
+        </div>
+        <div class="change-row">
+          <span class="change-label">OVN</span>
+          <span class="version-old">v24.03.2</span>
+          <span class="arrow">→</span>
+          <span class="version-new">v25.03.3</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Bug Fix -->
+    <section class="section" id="bugfix">
+      <div class="section-header">
+        <div class="section-icon icon-bug">✕</div>
+        <span class="section-title">버그 수정</span>
+        <span class="section-count">1 fix</span>
+      </div>
+
+      <div class="bug-card">
+        <span class="bug-icon">🔧</span>
+        <p class="bug-text">
+          <strong>kube-ovn / neutron-metadata-agent OVS 권한 오류</strong><br>
+          kube-ovn과 neutron-metadata-agent의 Open vSwitch 권한 업데이트 과정에서 발생하는 오류를 패치하였습니다.
+        </p>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- Version Tables -->
+    <section class="version-section" id="ver-os">
+      <div class="version-section-header">
+        <span class="vsec-icon" style="background:var(--accent-blue);box-shadow:0 0 6px var(--accent-blue)"></span>
+        <span class="vsec-title">OS 구성 요소</span>
+        <span class="vsec-sub">Ubuntu 24.04.2 LTS</span>
+      </div>
+      <table class="vtable">
+        <thead>
+          <tr><th>구성 요소</th><th>버전</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>OS</td><td><span class="vbadge vbadge-default">Ubuntu 24.04.2 LTS</span></td></tr>
+          <tr><td>Kernel</td><td><span class="vbadge vbadge-default">6.8.0-90</span></td></tr>
+          <tr><td>containerd</td><td><span class="vbadge vbadge-default">v2.1.4</span></td></tr>
+          <tr><td>Open vSwitch</td><td><span class="vbadge vbadge-default">3.5.3</span></td></tr>
+          <tr><td>libvirt</td><td><span class="vbadge vbadge-default">11.3.0</span></td></tr>
+          <tr><td>QEMU</td><td><span class="vbadge vbadge-default">10.0.7</span></td></tr>
+          <tr><td>BYOH Agent</td><td><span class="vbadge vbadge-default">0.5.0</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="version-section" id="ver-k8s">
+      <div class="version-section-header">
+        <span class="vsec-icon" style="background:var(--accent-cyan);box-shadow:0 0 6px var(--accent-cyan)"></span>
+        <span class="vsec-title">Kubernetes 구성 요소</span>
+        <span class="vsec-sub">v1.32.13</span>
+      </div>
+      <table class="vtable">
+        <thead>
+          <tr><th>구성 요소</th><th>버전</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Kubernetes (kubeadm/kubelet/kubectl)</td><td><span class="vbadge vbadge-default">v1.32.13</span></td></tr>
+          <tr><td>cluster-api</td><td><span class="vbadge vbadge-default">v1.10.4</span></td></tr>
+          <tr><td>cluster-api-byoh-provider</td><td><span class="vbadge vbadge-default">v0.5.0</span></td></tr>
+          <tr><td>etcd</td><td><span class="vbadge vbadge-default">v3.6.4</span></td></tr>
+          <tr><td>cert-manager</td><td><span class="vbadge vbadge-default">v1.17.2</span></td></tr>
+          <tr><td>helm</td><td><span class="vbadge vbadge-default">v3.18.4</span></td></tr>
+          <tr><td>kustomize</td><td><span class="vbadge vbadge-default">v5.7.1</span></td></tr>
+          <tr><td>kube-ovn</td><td><span class="vbadge vbadge-default">v1.15.4</span></td></tr>
+          <tr><td>OVN (northd/sb/sbctl)</td><td><span class="vbadge vbadge-default">v25.03.3</span></td></tr>
+          <tr><td>kube-proxy</td><td><span class="vbadge vbadge-default">v1.32.6</span></td></tr>
+          <tr><td>CoreDNS</td><td><span class="vbadge vbadge-default">v1.11.3</span></td></tr>
+          <tr><td>Node Local DNS</td><td><span class="vbadge vbadge-default">1.25.0</span></td></tr>
+          <tr><td>envoy (for ingress)</td><td><span class="vbadge vbadge-default">v1.6.2</span></td></tr>
+          <tr><td>Trident (NetApp provider)</td><td><span class="vbadge vbadge-default">v25.06.1</span></td></tr>
+          <tr><td>local-path-provisioner</td><td><span class="vbadge vbadge-default">v0.0.31</span></td></tr>
+          <tr><td>PostgreSQL Operator</td><td><span class="vbadge vbadge-default">1.25.1</span></td></tr>
+          <tr><td>Chrony</td><td><span class="vbadge vbadge-default">v2.0</span></td></tr>
+          <tr><td>Node Exporter</td><td><span class="vbadge vbadge-default">v1.9.0</span></td></tr>
+          <tr><td>Metrics Server</td><td><span class="vbadge vbadge-default">v0.7.2</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="version-section" id="ver-openstack">
+      <div class="version-section-header">
+        <span class="vsec-icon" style="background:var(--accent-purple);box-shadow:0 0 6px var(--accent-purple)"></span>
+        <span class="vsec-title">OpenStack 구성 요소</span>
+        <span class="vsec-sub">Epoxy 2025.1</span>
+      </div>
+      <table class="vtable">
+        <thead>
+          <tr><th>구성 요소</th><th>차트 버전</th><th>이미지 버전</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MariaDB Operator</td>
+            <td><span class="vbadge vbadge-default">0.38.1</span></td>
+            <td><span class="vbadge vbadge-default">11.4.3</span></td>
+          </tr>
+          <tr>
+            <td>RabbitMQ</td>
+            <td>—</td>
+            <td><span class="vbadge vbadge-default">4.0.5-management</span></td>
+          </tr>
+          <tr>
+            <td>Memcached</td>
+            <td><span class="vbadge vbadge-default">7.9.4</span></td>
+            <td><span class="vbadge vbadge-default">1.6.33-debian-12-r0</span></td>
+          </tr>
+          <tr>
+            <td>Keystone</td>
+            <td><span class="vbadge vbadge-default">2025.1.1</span></td>
+            <td><span class="vbadge vbadge-default">2025.1-1754180985</span></td>
+          </tr>
+          <tr>
+            <td>Barbican</td>
+            <td><span class="vbadge vbadge-default">2025.1.4</span></td>
+            <td><span class="vbadge vbadge-default">2025.1-1758414585</span></td>
+          </tr>
+          <tr>
+            <td>Glance</td>
+            <td><span class="vbadge vbadge-default">2025.1.3</span></td>
+            <td><span class="vbadge vbadge-default">2025.1-ubuntu_noble-20250520</span></td>
+          </tr>
+          <tr>
+            <td>Nova</td>
+            <td><span class="vbadge vbadge-default">2025.1.7</span></td>
+            <td><span class="vbadge vbadge-default">2025.1-ubuntu_noble-20250720</span></td>
+          </tr>
+          <tr>
+            <td>libvirt<span class="ktc-badge">KTC</span></td>
+            <td><span class="vbadge vbadge-default">2025.1-ktc.1</span></td>
+            <td><span class="vbadge vbadge-ktc">ktc-libvirt:11.3.0-3-r1</span></td>
+          </tr>
+          <tr>
+            <td>Cinder</td>
+            <td><span class="vbadge vbadge-default">2025.1.6</span></td>
+            <td><span class="vbadge vbadge-default">2025.1-ubuntu_noble-20250523</span></td>
+          </tr>
+          <tr>
+            <td>Neutron<span class="ktc-badge">KTC</span></td>
+            <td><span class="vbadge vbadge-default">2025.1.12</span></td>
+            <td><span class="vbadge vbadge-ktc">neutron:2025.1-1758413745-ktc.0.1</span></td>
+          </tr>
+          <tr>
+            <td>Placement</td>
+            <td><span class="vbadge vbadge-default">2025.1.1</span></td>
+            <td><span class="vbadge vbadge-default">2025.1-ubuntu_jammy-20250916</span></td>
+          </tr>
+          <tr>
+            <td>Octavia</td>
+            <td><span class="vbadge vbadge-default">2025.1.15-ktc.0.3</span></td>
+            <td><span class="vbadge vbadge-default">2025.1-1757809363</span></td>
+          </tr>
+          <tr>
+            <td>Manila</td>
+            <td><span class="vbadge vbadge-default">2025.1.3</span></td>
+            <td><span class="vbadge vbadge-default">2025.1-ubuntu_jammy-20251027</span></td>
+          </tr>
+          <tr>
+            <td>Horizon</td>
+            <td><span class="vbadge vbadge-default">2025.1.5</span></td>
+            <td><span class="vbadge vbadge-default">2025.1-ubuntu_jammy-20250916-ktc.0.1</span></td>
+          </tr>
+          <tr>
+            <td>OpenStack Client</td>
+            <td>—</td>
+            <td><span class="vbadge vbadge-default">trixie-3.12.12-1771893084</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="version-section" id="ver-cicd">
+      <div class="version-section-header">
+        <span class="vsec-icon" style="background:var(--accent-amber);box-shadow:0 0 6px var(--accent-amber)"></span>
+        <span class="vsec-title">CI/CD Tools</span>
+      </div>
+      <table class="vtable">
+        <thead>
+          <tr><th>구성 요소</th><th>차트 버전</th><th>이미지 버전</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ArgoCD</td>
+            <td>—</td>
+            <td><span class="vbadge vbadge-default">v3.1.1</span></td>
+          </tr>
+          <tr>
+            <td>Harbor</td>
+            <td><span class="vbadge vbadge-default">v1.17.2</span></td>
+            <td><span class="vbadge vbadge-default">v2.13.2</span></td>
+          </tr>
+          <tr>
+            <td>Gitea</td>
+            <td><span class="vbadge vbadge-default">v12.1.3</span></td>
+            <td><span class="vbadge vbadge-default">1.24.3</span></td>
+          </tr>
+          <tr>
+            <td>Vault</td>
+            <td><span class="vbadge vbadge-default">0.30.1</span></td>
+            <td><span class="vbadge vbadge-default">1.20.1</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<a class="scroll-top" href="#top" title="맨 위로">↑</a>
+
+<script>
+  // Active nav highlight on scroll
+  const sections = document.querySelectorAll('[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navItems.forEach(item => item.classList.remove('active'));
+        const active = document.querySelector(`.nav-item[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
