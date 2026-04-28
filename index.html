@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STACK Release Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c12;
+    --bg-panel: #0d1420;
+    --bg-card: #111827;
+    --bg-hover: #162032;
+    --border: #1e2d45;
+    --border-bright: #243650;
+    --text-primary: #e2eaf5;
+    --text-secondary: #7a93b4;
+    --text-muted: #4a6280;
+    --accent-blue: #2d8cf0;
+    --accent-cyan: #00d4c8;
+    --accent-green: #00e87a;
+    --accent-amber: #f0a020;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(45,140,240,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(45,140,240,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 720px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 56px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-cyan);
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 6vw, 52px);
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--text-primary) 40%, var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header p {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  /* Release list */
+  .release-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeUp 0.5s ease 0.1s both;
+  }
+
+  .release-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 28px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .release-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-cyan), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .release-card:hover {
+    border-color: var(--border-bright);
+    background: var(--bg-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  }
+
+  .release-card:hover::before { opacity: 1; }
+
+  .release-card.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: default;
+  }
+
+  .tag-badge {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+    width: 110px;
+  }
+
+  .release-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .release-title {
+    font-size: 14px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+  }
+
+  .release-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .release-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+  }
+
+  .chip-latest {
+    background: rgba(0,232,122,0.12);
+    border: 1px solid rgba(0,232,122,0.3);
+    color: var(--accent-green);
+  }
+
+  .chip-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s infinite;
+  }
+
+  .chip-released {
+    background: rgba(45,140,240,0.08);
+    border: 1px solid rgba(45,140,240,0.2);
+    color: var(--text-muted);
+  }
+
+  .chip-tbd {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .arrow {
+    color: var(--text-muted);
+    font-size: 18px;
+    transition: color 0.2s, transform 0.2s;
+  }
+
+  .release-card:hover .arrow {
+    color: var(--accent-cyan);
+    transform: translateX(3px);
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: 48px;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    animation: fadeUp 0.5s ease 0.2s both;
+  }
+
+  .footer a {
+    color: var(--accent-blue);
+    text-decoration: none;
+  }
+
+  .footer a:hover { text-decoration: underline; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  @media (max-width: 480px) {
+    .tag-badge { font-size: 18px; width: 90px; }
+    .release-card { padding: 18px 20px; }
+    .chip-released span:not(.chip-dot) { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="header">
+    <div class="eyebrow">kt-cloud-stack</div>
+    <h1>STACK<br>Release Notes</h1>
+    <p>OpenStack + Kubernetes 기반 클라우드 플랫폼 통합 릴리즈 노트</p>
+  </header>
+
+  <div class="release-list">
+
+    <a class="release-card" href="release-2026.05.html">
+      <span class="tag-badge">2026.05</span>
+      <div class="release-info">
+        <div class="release-title">경북/서울 리전 구축 이후 안정화 버전</div>
+        <div class="release-date">2026-05-06</div>
+      </div>
+      <div class="release-meta">
+        <span class="chip chip-latest"><span class="chip-dot"></span>Latest</span>
+        <span class="arrow">›</span>
+      </div>
+    </a>
+
+    <div class="release-card disabled">
+      <span class="tag-badge">2025.09</span>
+      <div class="release-info">
+        <div class="release-title">경북 CDC 구축을 위한 초기 릴리스</div>
+        <div class="release-date">2025-09-03</div>
+      </div>
+      <div class="release-meta">
+        <span class="chip chip-released">Released</span>
+      </div>
+    </div>
+
+    <div class="release-card disabled">
+      <span class="tag-badge">2025.06</span>
+      <div class="release-info">
+        <div class="release-title">OpenStack Bobcat → Caracal 업그레이드</div>
+        <div class="release-date">2025-07-15</div>
+      </div>
+      <div class="release-meta">
+        <span class="chip chip-released">Released</span>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <a href="https://github.com/kt-cloud-stack/stack-release" target="_blank" rel="noopener">
+      kt-cloud-stack/stack-release
+    </a>
+    &nbsp;·&nbsp; GitHub Releases
+  </footer>
+
+</div>
+</body>
+</html>
